@@ -62,9 +62,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
     } else if (passwordForController.text.isEmpty) {
       FocusScope.of(context).requestFocus(_confirm);
       return;
-    }
-
-    if (passwordNewController.text != passwordForController.text) {
+    }else if(passwordNewController.text != passwordForController.text) {
       showAlert(context, "Gagal", "Konfirmasi password tidak sesuai");
       return;
     }

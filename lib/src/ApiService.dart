@@ -1,16 +1,16 @@
 class ApiService {
   static Uri url(url) {
-    Uri Server = Uri.parse("http://172.17.202.17:8000/mobile/" + url);
+    Uri Server = Uri.parse("http://172.16.110.59:8000/mobile/" + url);
     return Server;
   }
 
   static Uri urlApi(url) {
-    Uri server = Uri.parse("http://172.17.202.17:8000/api/" + url);
+    Uri server = Uri.parse("http://172.16.110.59:8000/api/" + url);
     return server;
   }
 
   static String urlGambar(url) {
-    String Server = "http://172.17.202.17/webKucari/public/mobile/uploads/" + url;
+    String Server = "http://172.16.110.59/kucari_web/public/mobile/uploads/" + url;
     return Server;
   }
 

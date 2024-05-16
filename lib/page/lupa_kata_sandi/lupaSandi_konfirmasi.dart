@@ -1,9 +1,18 @@
+import 'dart:convert';
+
+import 'package:d_method/d_method.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:project_kucari/page/login_screen.dart';
+import 'package:project_kucari/src/ApiService.dart';
 import 'package:project_kucari/src/style.dart';
 import 'package:project_kucari/widget/textfield/custom_textfield.dart';
+import 'package:http/http.dart' as http;
 
 class NewPass extends StatefulWidget {
-  const NewPass({super.key});
+  const NewPass({super.key, required this.email});
+
+  final String email;
 
   @override
   State<NewPass> createState() => _NewPassState();
@@ -116,7 +125,20 @@ class _NewPassState extends State<NewPass> {
                 ),
                 SizedBox(height: 60.0),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async{
+                    DMethod.log('email selected : ${widget.email}');
+                    if(passwordController.text == passwordforController.text){
+                      await updatePassword(context, widget.email, passwordController.text);
+                    }else{
+                      Get.showSnackbar(
+                        const GetSnackBar(
+                          title: 'Peringatan',
+                          message: 'Password tidak cocok',
+                          duration: Duration(seconds: 4),
+                        ),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(
                         horizontal: 145.0,
@@ -159,4 +181,31 @@ class _NewPassState extends State<NewPass> {
       ),
     );
   }
+
+Future<void> updatePassword(BuildContext context, String email, String password) async {
+     // Ganti dengan URL server Anda
+    try {
+      var response = await http.post(
+        ApiService.url('update_pw.php'),
+        body: {
+          'email': email,
+          'password': password,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          Get.to(LoginScreen());
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['message'])));
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal terhubung ke server')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+    }
+  }
+
 }

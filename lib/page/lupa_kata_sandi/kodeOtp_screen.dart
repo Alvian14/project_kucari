@@ -8,9 +8,11 @@ class OTPScreen extends StatefulWidget {
   const OTPScreen({
     Key? key,
     required this.otp,
+    required this.email,
   }) : super(key: key);
 
   final String otp;
+  final String email;
 
   @override
   State<OTPScreen> createState() => _OTPScreenState();
@@ -46,7 +48,7 @@ class _OTPScreenState extends State<OTPScreen> {
               children: [
                 SizedBox(height: 140),
                 Text(
-                  'Kode telah dikirim ke WhatsApp Anda \n08**********',
+                  'Kode telah dikirim ke Email Anda',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
@@ -67,33 +69,33 @@ class _OTPScreenState extends State<OTPScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  'Kirim ulang kode dalam',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 17,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '53',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 17,
-                      ),
-                    ),
-                    Text(
-                      ' detik',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                      ),
-                    ),
-                  ],
-                ),
+                // Text(
+                //   'Kirim ulang kode dalam',
+                //   textAlign: TextAlign.center,
+                //   style: TextStyle(
+                //     color: Colors.black,
+                //     fontSize: 17,
+                //   ),
+                // ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     Text(
+                //       '53',
+                //       style: TextStyle(
+                //         color: Colors.red,
+                //         fontSize: 17,
+                //       ),
+                //     ),
+                //     Text(
+                //       ' detik',
+                //       style: TextStyle(
+                //         color: Colors.black,
+                //         fontSize: 17,
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 SizedBox(height: 250),
                 ElevatedButton(
                   onPressed: () {
@@ -103,7 +105,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     // );
 
                     if (widget.otp == otpInput) {
-                      Get.to(NewPass());
+                      Get.to(NewPass(email: widget.email,));
                     }else{
                       Get.showSnackbar(
                         const GetSnackBar(

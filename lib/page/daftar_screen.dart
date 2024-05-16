@@ -29,9 +29,7 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
   );
 
   // Pola validasi untuk nomor WhatsApp
-  RegExp whatsAppValidator = RegExp(
-    r'^[0-9]{10,15}$',
-  );
+  RegExp whatsAppValidator = RegExp(r'^08[0-9]{9,11}$');
 
   @override
   void dispose() {
@@ -62,35 +60,126 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
     Navigator.of(context).pop();
   }
 
+  // kode validasi validasi
   Future<void> registerUser() async {
-    // Set focus to empty input fields before registering user
     if (namaController.text.trim().isEmpty) {
-      showAlert(context, "Gagal", "Nama tidak boleh hanya spasi");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Nama tidak boleh hanya spasi"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
       FocusScope.of(context).requestFocus(_namaFocus);
       return;
     } else if (emailController.text.isEmpty) {
       FocusScope.of(context).requestFocus(_emailFocus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Email tidak boleh kosong"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     } else if (WhatsAppController.text.isEmpty) {
       FocusScope.of(context).requestFocus(_whatsAppFocus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Nomor WhatsApp tidak boleh kosong"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     } else if (passwordController.text.isEmpty) {
       FocusScope.of(context).requestFocus(_passwordFocus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Password tidak boleh kosong"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     } else if (passwordforController.text.isEmpty) {
       FocusScope.of(context).requestFocus(_passwordforFocus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Konfirmasi password tidak boleh kosong"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     } else if (passwordController.text != passwordforController.text) {
-      showAlert(context, "Gagal", "Konfirmasi password tidak sesuai");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Konfirmasi password tidak sesuai"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     } else if (!emailValidator.hasMatch(emailController.text)) {
-      showAlert(context, "Gagal", "Format email tidak valid");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Format email tidak valid"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     } else if (!whatsAppValidator.hasMatch(WhatsAppController.text)) {
-      showAlert(context, "Gagal", "Format nomor WhatsApp tidak valid");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Format nomor WhatsApp tidak valid"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
-    } 
+    }
 
+    // kode untuk check apakah email sudah terdaftar
+    final response = await http.post(
+      ApiService.url('check_email.php'), // Replace with your endpoint
+      body: {'email': emailController.text},
+    );
+
+    if (response.statusCode == 200) {
+      final responseJson = jsonDecode(response.body);
+      if (responseJson['success']) {
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Email sudah terdaftar"),
+            backgroundColor:
+                Colors.red, // Set warna latar belakang merah untuk error
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+    } else {
+      // Handle server error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan pada server'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    // kode untuk register
     try {
       final String apiUrl = ApiService.url('register.php').toString();
 
@@ -109,25 +198,38 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
         }),
       );
 
-      // Periksa apakah respons berhasil atau tidak
       if (response.statusCode == 200) {
         // Respons sukses
         final jsonResponse = jsonDecode(response.body); // Dekode JSON respons
-        showAlert(context, "Berhasil", jsonResponse['message']);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(jsonResponse['message']),
+            backgroundColor: Colors.green, // Tampilkan pesan di snackbar
+            duration: Duration(seconds: 2), // Durasi snackbar tampil
+          ),
+        );
+
         Future.delayed(Duration(seconds: 2), () {
           // Navigasi ke halaman login setelah menampilkan pesan berhasil
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    LoginScreen()), // Ganti LoginPage dengan halaman login Anda
+              builder: (context) =>
+                  LoginScreen(), // Ganti LoginPage dengan halaman login Anda
+            ),
           );
         });
       } else {
         // Respons gagal
         final errorMessage = jsonDecode(response.body)['message'] ??
             "Gagal mendaftarkan user"; // Ambil pesan error dari respons server, jika ada
-        showAlert(context, "Gagal", errorMessage);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage), // Tampilkan pesan error di snackbar
+            backgroundColor: AppColors.tomato,
+            duration: Duration(seconds: 5), // Durasi snackbar tampil
+          ),
+        );
       }
     } catch (e) {
       // Tangani kesalahan jaringan atau lainnya

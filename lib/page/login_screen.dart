@@ -81,7 +81,9 @@ class _LoginScreenState extends State<LoginScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('OK'),
+                  child: Text('OK',
+                  style: TextStyle(color: AppColors.tomato),
+                  ),
                 ),
               ],
             ),
@@ -105,6 +107,10 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
+
+  // login email
+  
 
 
   
@@ -283,47 +289,49 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  _buildButtonLogin() {
-    return Consumer<GoogleSignService>(
-      builder: (context, google, child) {
-        return ElevatedButton(
-          onPressed: ()async {
-            await google.googleLogin();
+  
 
-            ///
-            
+
+    _buildButtonLogin() {
+      return Consumer<GoogleSignService>(
+        builder: (context, google, child) {
+          return ElevatedButton(
+            onPressed: ()async {
+              await google.googleLogin();
+
+            //buatkan fungsion dari phpnya disini untuk get emailnya untuk login
             //
-            
-          },
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 11.0, horizontal: 83.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            primary: Colors.white,
-            side: BorderSide(
-              color: AppColors.gray200,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/img/search.png',
-                width: 24.0,
-                height: 24.0,
+              
+            },
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(vertical: 11.0, horizontal: 83.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
               ),
-              SizedBox(width: 8.0),
-              Text(
-                'Masuk dengan Google',
-                style: TextStyle(color: Colors.black).copyWith(
-                  fontSize: 14.0,
+              primary: Colors.white,
+              side: BorderSide(
+                color: AppColors.gray200,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/img/search.png',
+                  width: 24.0,
+                  height: 24.0,
                 ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+                SizedBox(width: 8.0),
+                Text(
+                  'Masuk dengan Google',
+                  style: TextStyle(color: Colors.black).copyWith(
+                    fontSize: 14.0,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
   }
-}

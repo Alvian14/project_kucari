@@ -152,8 +152,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                       onPressed: () async {
                         // Upload the image without picking from camera or gallery
                         await _uploadImage(); // Add await here
-                        Navigator.pop(
-                            context); // Close bottom sheet after upload
+                        Navigator.pop(context, true); // Close bottom sheet after upload
                       },
                       backgroundColor: Colors.blueGrey,
                       heroTag: 'upload',
@@ -218,6 +217,16 @@ class _ProfilScreenState extends State<ProfilScreen> {
             SizedBox(height: 50),
             Container(
               padding: EdgeInsets.only(left: 20, right: 20, bottom: 5),
+              child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        UbahProfil(userId: widget.userId),
+                  ),
+                );
+              },
               child: Column(
                 children: [
                   Row(
@@ -263,11 +272,22 @@ class _ProfilScreenState extends State<ProfilScreen> {
                 ],
               ),
             ),
+            ),
             //...
 
             SizedBox(height: 11),
             Container(
               padding: EdgeInsets.only(left: 20, right: 20, bottom: 5),
+              child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        UbahKataSandi(userId: widget.userId),
+                  ),
+                );
+              },
               child: Column(
                 children: [
                   Row(
@@ -313,6 +333,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                 ],
               ),
             ),
+            ),
             SizedBox(height: 100),
             GestureDetector(
               onTap: () {
@@ -351,6 +372,8 @@ void showLogoutConfirmationDialog(BuildContext context) {
             },
             child: Text(
               "Tidak",
+               style: TextStyle(color: AppColors.tomato)
+              ,
               // style,
             ),
           ),
@@ -363,7 +386,9 @@ void showLogoutConfirmationDialog(BuildContext context) {
                 MaterialPageRoute(builder: (context) => LoginScreen()),
               );
             },
-            child: Text("Iya"),
+            child: Text("Iya",
+             style: TextStyle(color: AppColors.hijau),
+            ),
           ),
         ],
       );

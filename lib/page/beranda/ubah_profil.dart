@@ -68,7 +68,9 @@ class _UbahProfilState extends State<UbahProfil> {
                     ),
                   );
                 },
-                child: Text('OK'),
+                child: Text('OK',
+                style: TextStyle(color: AppColors.hijau),
+                ),
               ),
             ],
           );

@@ -418,42 +418,34 @@ class PostinganList extends StatelessWidget {
                     style: TextStyles.label,
                   ),
                 ),
-                IconButton(
+                 IconButton(
                   icon: Icon(Icons.clear_outlined),
                   onPressed: () async {
                     // Tampilkan dialog konfirmasi
                     bool confirm = await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Konfirmasi'),
-                              content: Text(
-                                  'Apakah Anda yakin ingin menghapus postingan ini?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text('Tidak',
-                                  style: TextStyle(color: AppColors.tomato)
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(
-                                        false); // Tutup dialog dan kirim false
-                                  },
-                                ),
-                                TextButton(
-                                  child: Text('Iya',
-                                  style: TextStyle(color: AppColors.hijau)
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(true);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        ) ??
-                        false; // Menggunakan ?? false untuk menangani jika pengguna menekan tombol back
-
-                    // Hanya lanjutkan jika konfirmasi adalah true
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Konfirmasi'),
+                          content: Text('Apakah Anda yakin ingin menghapus postingan ini?'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('Tidak', style: TextStyle(color: Colors.red)),
+                              onPressed: () {
+                                Navigator.of(context).pop(false);
+                              },
+                            ),
+                            TextButton(
+                              child: Text('Iya', style: TextStyle(color: Colors.green)),
+                              onPressed: () {
+                                Navigator.of(context).pop(true);
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ) ?? false;
+                    
                     if (confirm) {
                       final response = await http.post(
                         ApiService.url('hapus_postingan.php'),
@@ -462,20 +454,17 @@ class PostinganList extends StatelessWidget {
 
                       if (response.statusCode == 200) {
                         final responseJson = jsonDecode(response.body);
-
                         if (responseJson['success']) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             backgroundColor: Colors.green,
                             content: Text('Postingan berhasil dihapus'),
                             duration: const Duration(seconds: 2),
                           ));
-                          // Mungkin tambahkan navigasi untuk refresh atau kembali ke halaman sebelumnya
-                          // Navigator.pop(context);
+                           Navigator.pop(context, true); 
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             backgroundColor: Colors.red,
-                            content: Text(
-                                'Gagal menghapus postingan: ${responseJson['message']}'),
+                            content: Text('Gagal menghapus postingan: ${responseJson['message']}'),
                             duration: const Duration(seconds: 2),
                           ));
                         }

@@ -16,7 +16,7 @@ class LupaKataSandi extends StatefulWidget {
 }
 
 class _LupaKataSandi extends State<LupaKataSandi> {
-  final WhatsAppController = TextEditingController();
+  final emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class _LupaKataSandi extends State<LupaKataSandi> {
                   ),
                   child: CustomTextField(
                     autofillHints: const [AutofillHints.email],
-                    controller: WhatsAppController,
+                    controller: emailController,
                     textInputType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
                     prefixIcon: 'assets/img/email.png',
@@ -91,27 +91,43 @@ class _LupaKataSandi extends State<LupaKataSandi> {
                     var url = ApiService.urlApi('otp');
                     var response = await http.post(
                       url,
-                      body: {'email': WhatsAppController.text},
+                      body: {'email': emailController.text},
                     );
 
                     Get.back();
 
                     if (response.statusCode == 200) {
-                      DMethod.log('OTP telah dikirim');
+                      DMethod.log('OTP body : ${response..body}');
                       var otpData = jsonDecode(response.body);
-                      var otp = otpData['otp'];
-                      DMethod.log('kode otp : $otp');
+                      if (otpData['status'] == 'success') {
+                         DMethod.log('OTP terkirim : ${response..body}');
+                        var otp = otpData['otp'];
+                        DMethod.log('kode otp: $otp');
 
-                      Get.off(
-                        OTPScreen(otp: otp),
-                        transition: Transition.rightToLeft,
-                        duration: const Duration(milliseconds: 500),
-                      );
+                        Get.off(
+                          OTPScreen(otp: otp, email: emailController.text,),
+                          transition: Transition.rightToLeft,
+                          duration: const Duration(milliseconds: 500),
+                        );
+                      } else {
+                        Get.showSnackbar(
+                          GetSnackBar(
+                            title: 'Peringatan',
+                            message:
+                                otpData['message'] ?? 'Error tidak dikenal',
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      }
                     } else {
+                      // Jika respons bukan 200, tampilkan kesalahan dari server atau pesan default
+                      var errorData = jsonDecode(response.body);
                       Get.showSnackbar(
-                        const GetSnackBar(
+                        GetSnackBar(
                           title: 'Peringatan',
-                          message: 'OTP berhasil terkirim',
+                          message: errorData['message'] ??
+                              'Terjadi kesalahan pada server',
+                          duration: Duration(seconds: 3),
                         ),
                       );
                     }

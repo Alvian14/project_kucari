@@ -67,10 +67,10 @@ class _UploadScreenState extends State<UploadScreen> {
           .showSnackBar(SnackBar(content: Text('Masukkan deskripsi')));
       FocusScope.of(context).requestFocus(_deskripsi);
       return;
-    } else if (deskripsiController.text.split("").where((word) => word != "").length <10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Deskripsi minimal 5 kata')));
-      return;
+    // } else if (deskripsiController.text.split("").where((word) => word != "").length <10) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //       SnackBar(content: Text('Deskripsi minimal 5 kata')));
+    //   return;
     } else if (alamatController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Pilih alamat terlebih dahulu')));
