@@ -38,9 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await _fetchUserImage();
-      await _fetchPostingan();
       await _fetchUserData();
-      // await _fetchPostImage();
+      await _fetchPostingan();
     });
   }
 
@@ -50,12 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
         await http.get(Uri.parse('$apiUrl?userId=${widget.userId}'));
     if (response.statusCode == 200) {
       final imageData = json.decode(response.body);
-      final fileName = imageData['fileName']; // Ini adalah URL lengkap gambar
-      if (fileName != null && fileName.isNotEmpty) {
-        setState(() {
-          _imageUrl = fileName; // Menyimpan URL gambar
-        });
-      }
+      final fileName = imageData['fileName'];
+      setState(() {
+        _imageUrl = fileName != null && fileName.isNotEmpty ? fileName : null;
+      });
     } else {
       throw Exception('Failed to load user image');
     }
@@ -314,6 +311,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       deskripsi: post.deskripsi,
                       imagePost: post.fotoPostingan,
                       idPostingan: post.idPostingan,
+                      onDelete: (){
+                        _fetchPostingan();
+                      },
                     );
                   },
                 ),
@@ -337,6 +337,7 @@ class PostinganList extends StatelessWidget {
     required String deskripsi,
     required String imagePost,
     required String idPostingan,
+    required this.onDelete, // Tambahkan parameter callback
   })  : _imageUrl = imageUrl,
         _username = username,
         _jam = jam,
@@ -354,6 +355,7 @@ class PostinganList extends StatelessWidget {
   final String _deskripsi;
   final String _imagePost;
   final String _idPostingan;
+  final VoidCallback onDelete; // Tambahkan parameter callback
 
   @override
   Widget build(BuildContext context) {
@@ -374,8 +376,7 @@ class PostinganList extends StatelessWidget {
                     CircleAvatar(
                       backgroundImage: _imageUrl != null
                           ? NetworkImage(_imageUrl!)
-                          : AssetImage('assets/img/logoKucari.png')
-                              as ImageProvider,
+                          : AssetImage('assets/img/logoKucari.png') as ImageProvider,
                     ),
                     SizedBox(width: 10),
                     Column(
@@ -387,13 +388,9 @@ class PostinganList extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Text(
-                              _jam,
-                            ),
+                            Text(_jam),
                             SizedBox(width: 10),
-                            Text(
-                              _tgl,
-                            ),
+                            Text(_tgl),
                           ],
                         ),
                       ],
@@ -403,13 +400,11 @@ class PostinganList extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 1.0),
+                    padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 1.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    backgroundColor: _kategori.toLowerCase() ==
-                            'kehilangan' // pastikan kata 'kehilangan' kecil semua
+                    backgroundColor: _kategori.toLowerCase() == 'kehilangan'
                         ? AppColors.merahPudar
                         : AppColors.hijau,
                   ),
@@ -418,34 +413,35 @@ class PostinganList extends StatelessWidget {
                     style: TextStyles.label,
                   ),
                 ),
-                 IconButton(
+                IconButton(
                   icon: Icon(Icons.clear_outlined),
                   onPressed: () async {
                     // Tampilkan dialog konfirmasi
                     bool confirm = await showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Konfirmasi'),
-                          content: Text('Apakah Anda yakin ingin menghapus postingan ini?'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text('Tidak', style: TextStyle(color: Colors.red)),
-                              onPressed: () {
-                                Navigator.of(context).pop(false);
-                              },
-                            ),
-                            TextButton(
-                              child: Text('Iya', style: TextStyle(color: Colors.green)),
-                              onPressed: () {
-                                Navigator.of(context).pop(true);
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    ) ?? false;
-                    
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Konfirmasi'),
+                              content: Text('Apakah Anda yakin ingin menghapus postingan ini?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text('Tidak', style: TextStyle(color: Colors.red)),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text('Iya', style: TextStyle(color: Colors.green)),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ) ??
+                        false;
+
                     if (confirm) {
                       final response = await http.post(
                         ApiService.url('hapus_postingan.php'),
@@ -460,7 +456,7 @@ class PostinganList extends StatelessWidget {
                             content: Text('Postingan berhasil dihapus'),
                             duration: const Duration(seconds: 2),
                           ));
-                           Navigator.pop(context, true); 
+                          onDelete(); // Panggil callback untuk mengupdate daftar postingan
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             backgroundColor: Colors.red,
@@ -484,7 +480,6 @@ class PostinganList extends StatelessWidget {
           Align(
             alignment: Alignment.topLeft,
             child: Text(
-              // 'Sebuah kucing berwarna oren yang tidak diketahui namanya',
               _deskripsi,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,

@@ -117,6 +117,20 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
         ),
       );
       return;
+    } else if (passwordforController.text.isEmpty ||
+        passwordforController.text.length < 6 ||
+        passwordforController.text.length > 8) {
+      FocusScope.of(context).requestFocus(_passwordforFocus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "Password tidak boleh kosong. Panjang minimal 6 dan maksimal 8 karakter"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
     } else if (passwordController.text != passwordforController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
