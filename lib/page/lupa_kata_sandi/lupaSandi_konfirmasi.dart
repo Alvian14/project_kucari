@@ -22,6 +22,16 @@ class _NewPassState extends State<NewPass> {
   final passwordController = TextEditingController();
   final passwordforController = TextEditingController();
   bool isObscure = true;
+  FocusNode _passwordFocus = FocusNode();
+  FocusNode _passwordForFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _passwordForFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +88,8 @@ class _NewPassState extends State<NewPass> {
                     textInputAction: TextInputAction.next,
                     prefixIcon: 'assets/img/Lock.png',
                     hint: '',
-
+                    maxLength: 8,
+                    focusNode: _passwordFocus,
                     isObscure: isObscure,
                     hasSuffix: true,
                     onPressed: () {
@@ -114,8 +125,10 @@ class _NewPassState extends State<NewPass> {
                     textInputAction: TextInputAction.done,
                     prefixIcon: 'assets/img/Lock.png',
                     hint: '',
+                    maxLength: 8,
                     isObscure: isObscure,
                     hasSuffix: true,
+                    focusNode: _passwordForFocus,
                     onPressed: () {
                       setState(() {
                         isObscure = !isObscure;
@@ -125,11 +138,12 @@ class _NewPassState extends State<NewPass> {
                 ),
                 SizedBox(height: 60.0),
                 ElevatedButton(
-                  onPressed: () async{
+                  onPressed: () async {
                     DMethod.log('email selected : ${widget.email}');
-                    if(passwordController.text == passwordforController.text){
-                      await updatePassword(context, widget.email, passwordController.text);
-                    }else{
+                    if (passwordController.text == passwordforController.text) {
+                      await updatePassword(
+                          context, widget.email, passwordController.text);
+                    } else {
                       Get.showSnackbar(
                         const GetSnackBar(
                           title: 'Peringatan',
@@ -182,8 +196,41 @@ class _NewPassState extends State<NewPass> {
     );
   }
 
-Future<void> updatePassword(BuildContext context, String email, String password) async {
-     // Ganti dengan URL server Anda
+  Future<void> updatePassword(BuildContext context, String email, String password) async {
+    RegExp noSpacesValidator = RegExp(r'^\S+$');
+
+    if (passwordController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_passwordFocus);
+      return;
+    } else if (passwordforController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_passwordForFocus);
+      return;
+    } else if (!noSpacesValidator.hasMatch(passwordController.text)) {
+      FocusScope.of(context).requestFocus(_passwordFocus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Password tidak boleh mengandung spasi"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    } else if (passwordforController.text.isEmpty ||
+        passwordforController.text.length < 6 ||
+        passwordforController.text.length > 8) {
+      FocusScope.of(context).requestFocus(_passwordForFocus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Panjang minimal 6 dan maksimal 8 digit"),
+          backgroundColor:
+              Colors.red, // Set warna latar belakang merah untuk error
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     try {
       var response = await http.post(
         ApiService.url('update_pw.php'),
@@ -198,14 +245,16 @@ Future<void> updatePassword(BuildContext context, String email, String password)
         if (data['status'] == 'success') {
           Get.to(LoginScreen());
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['message'])));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(data['message'])));
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal terhubung ke server')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Gagal terhubung ke server')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
     }
   }
-
 }

@@ -337,7 +337,7 @@ class PostinganList extends StatelessWidget {
     required String deskripsi,
     required String imagePost,
     required String idPostingan,
-    required this.onDelete, // Tambahkan parameter callback
+    required this.onDelete, 
   })  : _imageUrl = imageUrl,
         _username = username,
         _jam = jam,
@@ -355,7 +355,7 @@ class PostinganList extends StatelessWidget {
   final String _deskripsi;
   final String _imagePost;
   final String _idPostingan;
-  final VoidCallback onDelete; // Tambahkan parameter callback
+  final VoidCallback onDelete; 
 
   @override
   Widget build(BuildContext context) {

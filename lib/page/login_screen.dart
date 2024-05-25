@@ -39,12 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
       FocusScope.of(context).requestFocus(_passwordFocus);
       return;
     }
-
     if (_formKey.currentState!.validate()) {
       final String email = emailController.text.trim();
       final String password = passwordController.text.trim();
-
-      // **API Call with Error Handling**
       try {
         final String apiUrl = ApiService.url('login.php').toString();
         final response = await http.post(
@@ -54,12 +51,11 @@ class _LoginScreenState extends State<LoginScreen> {
             'password': password,
           }),
         );
-
+        
         final responseData = jsonDecode(response.body);
-
         if (responseData['status'] == 'success') {
           // Jika login berhasil, simpan userId dan pindahkan ke NavbarScreen
-          int userId = responseData['userId']; // Misalnya, userId dikirimkan dari respons login
+          int userId = responseData['userId']; 
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -236,16 +232,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 18.0),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: 100.0,
-                      ),
-                      child: _buildButtonLogin(),
-                    ),
-                  ),
+                  // SizedBox(height: 18.0),
+                  // SingleChildScrollView(
+                  //   scrollDirection: Axis.horizontal,
+                  //   child: ConstrainedBox(
+                  //     constraints: BoxConstraints(
+                  //       minWidth: 100.0,
+                  //     ),
+                  //     child: _buildButtonLogin(),
+                  //   ),
+                  // ),
                   SizedBox(height: 50.0),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,

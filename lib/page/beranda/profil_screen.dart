@@ -63,6 +63,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
 
     if (streamedResponse.statusCode == 200) {
       print('Gambar berhasil diunggah');
+      await _fetchUserImage(); // Refresh user image
     } else {
       print('Gagal mengunggah gambar: ${streamedResponse.reasonPhrase}');
     }
@@ -152,7 +153,8 @@ class _ProfilScreenState extends State<ProfilScreen> {
                       onPressed: () async {
                         // Upload the image without picking from camera or gallery
                         await _uploadImage(); // Add await here
-                        Navigator.pop(context, true); // Close bottom sheet after upload
+                        Navigator.pop(
+                            context, true); // Close bottom sheet after upload
                       },
                       backgroundColor: Colors.blueGrey,
                       heroTag: 'upload',
@@ -163,6 +165,29 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     )
                   : const Material(),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showImageDialog(BuildContext context, ImageProvider imageProvider) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: ClipOval(
+            child: Container(
+              width: 300, // Set the desired width
+              height: 300, // Set the desired height
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ),
         );
       },
@@ -187,11 +212,20 @@ class _ProfilScreenState extends State<ProfilScreen> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    // backgroundColor: AppColors.hij,
                     backgroundImage: _imageUrl != null
                         ? NetworkImage(_imageUrl!)
                         : AssetImage('assets/img/logoKucari.png')
                             as ImageProvider,
+                    child: InkWell(
+                      onTap: () {
+                        _showImageDialog(
+                            context,
+                            _imageUrl != null
+                                ? NetworkImage(_imageUrl!)
+                                : AssetImage('assets/img/logoKucari.png')
+                                    as ImageProvider);
+                      },
+                    ),
                   ),
                   Positioned(
                     top: 55,
@@ -199,7 +233,8 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     child: IconButton(
                       icon: Icon(Icons.edit),
                       onPressed: () {
-                        _showSheet(context); // Call function to show bottom sheet
+                        _showSheet(
+                            context); // Call function to show bottom sheet
                       },
                     ),
                   ),
@@ -214,126 +249,125 @@ class _ProfilScreenState extends State<ProfilScreen> {
                 _email, // Ganti dengan email
                 style: TextStyles.hint,
               ),
-        
+
               SizedBox(height: 50),
               Container(
                 padding: EdgeInsets.only(left: 20, right: 20, bottom: 5),
                 child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          UbahProfil(userId: widget.userId),
-                    ),
-                  );
-                },
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/icon/ballot.png', // Ganti dengan path gambar yang diinginkan
-                              width: 25,
-                              height: 25,
-                            ),
-                            SizedBox(width: 15),
-                            Text(
-                              'Ubah Profil',
-                              style: TextStyles.hint,
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: Image.asset(
-                            'assets/icon/next.png',
-                            width: 20,
-                            height: 20,
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    UbahProfil(userId: widget.userId),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UbahProfil(userId: widget.userId),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Image.asset(
+                                'assets/icon/ballot.png', // Ganti dengan path gambar yang diinginkan
+                                width: 25,
+                                height: 25,
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    Container(
-                      height: 2,
-                      color: AppColors.gray200,
-                      margin: EdgeInsets.only(top: 5),
-                    ),
-                  ],
+                              SizedBox(width: 15),
+                              Text(
+                                'Ubah Profil',
+                                style: TextStyles.hint,
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: Image.asset(
+                              'assets/icon/next.png',
+                              width: 20,
+                              height: 20,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      UbahProfil(userId: widget.userId),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      Container(
+                        height: 2,
+                        color: AppColors.gray200,
+                        margin: EdgeInsets.only(top: 5),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              ),
               //...
-        
+
               SizedBox(height: 11),
               Container(
                 padding: EdgeInsets.only(left: 20, right: 20, bottom: 5),
                 child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          UbahKataSandi(userId: widget.userId),
-                    ),
-                  );
-                },
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/icon/ballot.png', // Ganti dengan path gambar yang diinginkan
-                              width: 25,
-                              height: 25,
-                            ),
-                            SizedBox(width: 15),
-                            Text(
-                              'Ubah Kata Sandi',
-                              style: TextStyles.hint,
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: Image.asset(
-                            'assets/icon/next.png',
-                            width: 20,
-                            height: 20,
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    UbahKataSandi(userId: widget.userId),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            UbahKataSandi(userId: widget.userId),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Image.asset(
+                                'assets/icon/ballot.png', // Ganti dengan path gambar yang diinginkan
+                                width: 25,
+                                height: 25,
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    Container(
-                      height: 2,
-                      color: AppColors.gray200,
-                      margin: EdgeInsets.only(top: 5),
-                    ),
-                  ],
+                              SizedBox(width: 15),
+                              Text(
+                                'Ubah Kata Sandi',
+                                style: TextStyles.hint,
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: Image.asset(
+                              'assets/icon/next.png',
+                              width: 20,
+                              height: 20,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      UbahKataSandi(userId: widget.userId),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      Container(
+                        height: 2,
+                        color: AppColors.gray200,
+                        margin: EdgeInsets.only(top: 5),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               ),
               SizedBox(height: 250),
               GestureDetector(
@@ -374,8 +408,7 @@ void showLogoutConfirmationDialog(BuildContext context) {
             },
             child: Text(
               "Tidak",
-               style: TextStyle(color: AppColors.tomato)
-              ,
+              style: TextStyle(color: AppColors.tomato),
               // style,
             ),
           ),
@@ -388,8 +421,9 @@ void showLogoutConfirmationDialog(BuildContext context) {
                 MaterialPageRoute(builder: (context) => LoginScreen()),
               );
             },
-            child: Text("Iya",
-             style: TextStyle(color: AppColors.hijau),
+            child: Text(
+              "Iya",
+              style: TextStyle(color: AppColors.hijau),
             ),
           ),
         ],

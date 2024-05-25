@@ -53,6 +53,8 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
   }
 
   Future<void> _updatePassword() async {
+    RegExp noSpacesValidator = RegExp(r'^\S+$');
+
     if (passwordOldController.text.isEmpty) {
       FocusScope.of(context).requestFocus(_oldPassword);
       return;
@@ -62,15 +64,21 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
     } else if (passwordForController.text.isEmpty) {
       FocusScope.of(context).requestFocus(_confirm);
       return;
-    }else if(passwordNewController.text != passwordForController.text) {
+    } else if (passwordNewController.text != passwordForController.text) {
+      FocusScope.of(context).requestFocus(_confirm);
       showAlert(context, "Gagal", "Konfirmasi password tidak sesuai");
       return;
+    } else if (!noSpacesValidator.hasMatch(passwordForController.text)) {
+      FocusScope.of(context).requestFocus(_confirm);
+      showAlert(context, "Gagal", "Password tidak boleh mengandung spasi");
+      return;
+    }else if (passwordForController.text.isEmpty ||
+        passwordForController.text.length < 6 ||
+        passwordForController.text.length > 8) {
+      FocusScope.of(context).requestFocus(_confirm);
+      showAlert(context, "Gagal", "Panjang minimal 6 dan maksimal 8 digit");
+      return;
     }
-
-    // if (passwordOldController.text) {
-    //     showAlert(context, "Gagal", "Format email tidak valid");
-    //     return;
-    //   }
 
     try {
       final String apiUrl =
@@ -97,7 +105,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Tutup dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text('OK'),
                 ),
@@ -169,6 +177,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
                       focusNode: _oldPassword,
                       isObscure: isObscure,
                       hasSuffix: true,
+                      maxLength: 8,
                       onPressed: () {
                         setState(() {
                           isObscure = !isObscure;
@@ -176,7 +185,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
                       },
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 0),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -203,6 +212,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
                       focusNode: _newPassword,
                       isObscure: isObscure,
                       hasSuffix: true,
+                      maxLength: 8,
                       onPressed: () {
                         setState(() {
                           isObscure = !isObscure;
@@ -210,7 +220,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
                       },
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 0),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -237,6 +247,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
                       focusNode: _confirm,
                       isObscure: isObscure,
                       hasSuffix: true,
+                      maxLength: 8,
                       onPressed: () {
                         setState(() {
                           isObscure = !isObscure;
